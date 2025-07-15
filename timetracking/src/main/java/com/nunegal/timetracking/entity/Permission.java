@@ -12,7 +12,7 @@ public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="idpermission")
-    private Long id;
+    private int id;
 
     private LocalDate date;
     private LocalTime entry;
@@ -25,7 +25,7 @@ public class Permission {
 
     public Permission() {}
 
-    public Permission(Long id, LocalDate date, LocalTime entry, LocalTime exit, String description) {
+    public Permission(int id, LocalDate date, LocalTime entry, LocalTime exit, String description) {
         this.id = id;
         this.date = date;
         this.entry = entry;
@@ -33,8 +33,8 @@ public class Permission {
         this.description = description;
     }
 
-    public Long getId() {return id; }
-    public void setId(Long idn) {this.id = id; }
+    public int getId() {return id; }
+    public void setId(int id) {this.id = id; }
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
     public LocalTime getEntry() { return entry; }

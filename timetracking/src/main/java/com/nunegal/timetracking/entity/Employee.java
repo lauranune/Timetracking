@@ -9,13 +9,14 @@ public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="iduser")
-    private Long id;
+    private int id;
 
     private String name;
     private String surname;
 
     private String username;
     private String password;
+    private boolean enabled;
 
     @ManyToOne
     @JoinColumn(name="department_iddepartment")
@@ -25,20 +26,35 @@ public class Employee {
     @JoinColumn(name= "rol_idrol")
     private Rol rol;
 
+    @ManyToOne
+    @JoinColumn(name="schedule_idschedule")
+    private Schedule schedule;
+
     public Employee() {}
 
-    public Employee(Long id, String name, String surname, String username, String password, Department department, Rol rol) {
+    //Constructor de pruebas
+    public Employee(String username, String password, boolean enabled, Department department, Rol rol, Schedule schedule ) {
+        this.username = username;
+        this.password = password;
+        this.enabled = enabled;
+        this.department = department;
+        this.rol = rol;
+        this.schedule = schedule;
+    }
+
+    public Employee(int id, String name, String surname, String username, String password, boolean enabled, Department department, Rol rol) {
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.username = username;
         this.password = password;
+        this.enabled = enabled;
         this.department = department;
         this.rol = rol;
     }
 
-    public Long getId() {return id;}
-    public void setId(Long iduser) {this.id = iduser;}
+    public int getId() {return id;}
+    public void setId(int iduser) {this.id = iduser;}
     public String getName() {return name;}
     public void setName(String name) {this.name = name;}
     public String getSurname() {return surname;}
@@ -47,10 +63,14 @@ public class Employee {
     public void setUsername(String user) {this.username = user;}
     public String getPassword() {return password;}
     public void setPassword(String password) {this.password = password;}
+    public boolean isEnabled() {return enabled;}
+    public void setEnabled(boolean enabled) {this.enabled = enabled;}
     public Department getDepartment() {return department;}
     public void setDepartment(Department department) {this.department = department;}
     public Rol getRol() {return rol;}
     public void setRol(Rol rol) {this.rol = rol;}
+    public Schedule getSchedule() {return schedule;}
+    public void setSchedule(Schedule schedule) {this.schedule = schedule;}
 
     @Override
     public String toString() {

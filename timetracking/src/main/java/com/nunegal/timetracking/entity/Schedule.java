@@ -13,7 +13,7 @@ public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="idschedule")
-    private Long id;
+    private int id;
 
     private LocalDate date;
 
@@ -28,12 +28,12 @@ public class Schedule {
     private LocalTime exit;
 
     @ManyToOne
-    @JoinColumn(name="idschedule")
+    @JoinColumn(name="working_type_idworking_type")
     private WorkingType workingType;
 
     public Schedule() {}
 
-    public Schedule (Long id, LocalDate date, LocalTime entry, LocalTime pause_entry, LocalTime pause_exit, LocalTime lunch_entry, LocalTime lunch_exit, LocalTime exit) {
+    public Schedule (int id, LocalDate date, LocalTime entry, LocalTime pause_entry, LocalTime pause_exit, LocalTime lunch_entry, LocalTime lunch_exit, LocalTime exit) {
         this.id = id;
         this.date = date;
         this.entry = entry;
@@ -43,8 +43,8 @@ public class Schedule {
         this.lunch_exit = lunch_exit;
         this.exit = exit;
     }
-    public Long getId() {return id;}
-    public void setId(Long id) {this.id = id;}
+    public int getId() {return id;}
+    public void setId(int id) {this.id = id;}
     public LocalDate getDate() {return date;}
     public void setDate(LocalDate date) {this.date = date;}
     public LocalTime getEntry() {return entry;}
