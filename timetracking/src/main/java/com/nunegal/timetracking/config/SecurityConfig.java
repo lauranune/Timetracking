@@ -27,8 +27,8 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/css/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/user/**").hasRole("USER")
+                        .requestMatchers("/admin/**").hasRole("admin")
+                        .requestMatchers("/user/**").hasRole("user")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -41,6 +41,8 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/")
                         .permitAll()
                 )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedPage("/access-denied"))
                 .userDetailsService(userDetailService)
                 .build();
     }
@@ -55,10 +57,10 @@ public class SecurityConfig {
         return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
             for (GrantedAuthority authority : authentication.getAuthorities()) {
                 String role = authority.getAuthority();
-                if (role.equals("ROLE_ADMIN")) {
+                if (role.equals("ROLE_admin")) {
                     response.sendRedirect("/admin/index");
                     return;
-                } else if (role.equals("ROLE_USER")) {
+                } else if (role.equals("ROLE_user")) {
                     response.sendRedirect("/user/index");
                     return;
                 }

@@ -50,7 +50,6 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
         );
     }
 
-    // Guardar nuevo empleado (usando DTO)
     @Override
     public EmployeeDto save(EmployeeDto employeeDto) {
         if (existsByUsername(employeeDto.getUsername())) {
@@ -58,7 +57,7 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
         }
         Employee employee= employeeMapper.toEntity(employeeDto);
         employeeRepository.save(employee);
-        return EmployeeMapper.toEmployeeDto(employee);
+        return employeeMapper.toEmployeeDto(employee);
     }
 
     @Override
@@ -68,7 +67,7 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
         }
         employeeDto.setPassword(encryptPassword(employeeDto.getPassword()));
         Employee updated = employeeRepository.save(employeeMapper.toEntity(employeeDto));
-        return EmployeeMapper.toEmployeeDto(updated);
+        return employeeMapper.toEmployeeDto(updated);
     }
 
     @Override
@@ -80,21 +79,21 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
     public List<EmployeeDto> findAll() {
         return employeeRepository.findAll()
                 .stream()
-                .map(EmployeeMapper::toEmployeeDto)
+                .map(employeeMapper::toEmployeeDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public EmployeeDto findById(int id) {
         return employeeRepository.findById((int) id)
-                .map(EmployeeMapper::toEmployeeDto)
+                .map(employeeMapper::toEmployeeDto)
                 .orElse(null);
     }
 
     @Override
     public EmployeeDto findByUsername(String username) {
         return employeeRepository.findByUsername(username)
-                .map(EmployeeMapper::toEmployeeDto)
+                .map(employeeMapper::toEmployeeDto)
                 .orElse(null);
     }
 

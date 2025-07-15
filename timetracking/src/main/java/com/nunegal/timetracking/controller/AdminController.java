@@ -1,7 +1,9 @@
 package com.nunegal.timetracking.controller;
 
 import com.nunegal.timetracking.dto.EmployeeDto;
+import com.nunegal.timetracking.entity.Department;
 import com.nunegal.timetracking.entity.Employee;
+import com.nunegal.timetracking.service.EmployeeService;
 import com.nunegal.timetracking.service.EmployeeServiceImple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,12 +19,15 @@ import java.util.List;
 public class AdminController {
 
     @Autowired
-    private EmployeeServiceImple employeeService;
+    private EmployeeService employeeService;
+    //@Autowired
+    //private DepartmentService departmentService;
 
     @GetMapping("/index")
     public String index(Model model, Principal principal) {
         List<EmployeeDto> employeeList= employeeService.findAll();
-        model.addAttribute("employeeList", employeeList);
+        System.out.println("Número de empleados: " + employeeList.size());
+        model.addAttribute("employees", employeeList);
         model.addAttribute("username", principal.getName());
         return "admin/index";
     }

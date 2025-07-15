@@ -101,5 +101,6 @@ public class EmployeeDto implements Serializable {
    public void setRolType(String rolType) {this.rolType = rolType;}
    public int getScheduleId() {return scheduleId;}
    public void setScheduleId(int scheduleId) {this.scheduleId = scheduleId;}
-
+   public String getScheduleName(){return scheduleName;}
+   public void setScheduleName(String name){this.scheduleName = name;}
 }

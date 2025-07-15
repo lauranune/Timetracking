@@ -17,18 +17,17 @@ public interface EmployeeMapper {
     @Mapping(target = "schedule.id", source = "scheduleId")
     Employee toEntity(EmployeeDto dto);
 
+    @Mapping(target = "departmentId", source = "department.id")
+    @Mapping(target = "departmentName", source = "department.name")
+    @Mapping(target = "rolId", source = "rol.id")
+    @Mapping(target = "scheduleId", source = "schedule.id")
+    @Mapping(target = "rolType", source = "rol.type")
+    @Mapping(target = "scheduleName", source = "schedule.workingType.name")
+    EmployeeDto toEmployeeDto(Employee employee);
+
     List<EmployeeDto> toEmployeeDto(List<Employee> employees);
 
     void updateEmployee(@MappingTarget Employee employee, EmployeeDto dto);
 
-    @Mapping(target = "departmentId", source = "department.id")
-    @Mapping(target = "departmentName", source = "department.name")
-    @Mapping(target = "rolId", source = "rol.id")
-    // @Mapping(target="rolName", source = "rol.name") -> Error
-    @Mapping(target = "scheduleId", source = "schedule.id")
-    static
-        // @Mapping(target = "scheduleName", source="schedule.name") -> Error
-    EmployeeDto toEmployeeDto(Employee employee) {
-        return null;
-    }
+
 }

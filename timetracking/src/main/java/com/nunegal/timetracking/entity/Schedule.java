@@ -33,7 +33,7 @@ public class Schedule {
 
     public Schedule() {}
 
-    public Schedule (int id, LocalDate date, LocalTime entry, LocalTime pause_entry, LocalTime pause_exit, LocalTime lunch_entry, LocalTime lunch_exit, LocalTime exit) {
+    public Schedule (int id, LocalDate date, LocalTime entry, LocalTime pause_entry, LocalTime pause_exit, LocalTime lunch_entry, LocalTime lunch_exit, LocalTime exit, WorkingType workingType) {
         this.id = id;
         this.date = date;
         this.entry = entry;
@@ -42,6 +42,7 @@ public class Schedule {
         this.lunch_entry = lunch_entry;
         this.lunch_exit = lunch_exit;
         this.exit = exit;
+        this.workingType = workingType;
     }
     public int getId() {return id;}
     public void setId(int id) {this.id = id;}

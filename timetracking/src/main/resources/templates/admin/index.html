@@ -32,9 +32,9 @@
                     <td th:text="${employee.id}"></td>
                     <td th:text="${employee.name}"></td>
                     <td th:text="${employee.surname}"></td>
-                    <td th:text="${employee.department}"></td>
-                    <td th:text="${employee.rol}"></td>
-                    <td th:text="${employee.schedule}"></td>
+                    <td th:text="${employee.departmentName}"></td>
+                    <td th:text="${employee.rolType}"></td>
+                    <td th:text="${employee.scheduleName}"></td>
                     <td>
                         <button class="btn btn-danger delete-btn" th:data-id="${employee.id}">Borrar</button>
                     </td>
@@ -46,8 +46,8 @@
                                 data-nome=${employee.name},
                                 data-surname=${employee.surname},
                                 data-department=${employee.departmentId},
-                                data-rol=${employee.rol},
-                                data-schedule=${employee.schedule}">Editar</button>
+                                data-rol=${employee.rolType},
+                                data-schedule=${employee.scheduleId}">Editar</button>
                     </td>
                 </tr>
             </tbody>

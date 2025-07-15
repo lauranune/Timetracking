@@ -15,21 +15,16 @@ import java.security.Principal;
 
 @Controller
 @RequestMapping("/user")
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasRole('user')")
 public class UserController {
 
     @Autowired
     private EmployeeServiceImple employeeService;
 
-//    @GetMapping("/profile")
-//    public String profile(Model model) {
-//        return "user/profile";
-//    }
-
     @GetMapping("/index")
     public String index(Model model, Principal principal) {
         model.addAttribute("username", principal.getName());
-        return "index";
+        return "user/index";
     }
 
     @GetMapping("/profile")
