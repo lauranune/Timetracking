@@ -50,7 +50,7 @@ public class AdminController {
         model.addAttribute("department", departmentService.findAll());
         model.addAttribute("rol", rolService.findAll());
         model.addAttribute("schedule", scheduleService.findAll());
-        return "modalEdit :: modalEdit";
+        return "modalEdit :: modalEditAdmin";
     }
 
     @PostMapping("/edit")
