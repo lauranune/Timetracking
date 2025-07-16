@@ -72,7 +72,7 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
 
     @Override
     public void delete(int id) {
-        employeeRepository.deleteById((int) id);
+        employeeRepository.deleteById(id);
     }
 
     @Override

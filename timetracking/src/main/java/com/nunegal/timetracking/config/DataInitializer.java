@@ -39,9 +39,9 @@ public class DataInitializer implements CommandLineRunner {
             return;
         }
 
-        Optional<Department> department= departmentRepository.findById(1L);
-        Optional <Rol> rol= rolRepository.findById(2L);
-        Optional <Schedule> schedule= scheduleRepository.findById(1L);
+        Optional<Department> department= departmentRepository.findById(1);
+        Optional <Rol> rol= rolRepository.findById(2);
+        Optional <Schedule> schedule= scheduleRepository.findById(1);
 
 
         EmployeeDto dto= new EmployeeDto();
