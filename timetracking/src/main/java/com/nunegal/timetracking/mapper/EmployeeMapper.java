@@ -5,11 +5,10 @@ import com.nunegal.timetracking.entity.Employee;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-@Mapper(componentModel= "spring")
+@Mapper(componentModel = "spring")
 public interface EmployeeMapper {
 
     @Mapping(target = "department.id", source = "departmentId")
@@ -27,7 +26,8 @@ public interface EmployeeMapper {
 
     List<EmployeeDto> toEmployeeDto(List<Employee> employees);
 
+    @Mapping(target = "department.id", source = "departmentId")
+    @Mapping(target = "rol.id", source = "rolId")
+    @Mapping(target = "schedule.id", source = "scheduleId")
     void updateEmployee(@MappingTarget Employee employee, EmployeeDto dto);
-
-
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/style.css}">
@@ -8,14 +8,14 @@
 <body>
 <div class="modal fade" id="modalEditAdmin" th:fragment="modalEditAdmin" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalEdit" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-dialog">
+        <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Edita el trabajador</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="formEdit" th:action="@{/admin/edit}" th:method="post" th:object="${employee}">
-                    <input type="hidden" name="edit-id" th:field="*{id}">
+                    <input type="hidden" th:field="*{id}">
                     <div class="mb-3">
                         <label for="edit-name" class="form-label">Nombre</label>
                         <input type="text" class="form-control" id="edit-name" th:field="*{name}" required>
@@ -29,8 +29,8 @@
                     <div class="mb-3">
                         <label for="edit-departmentId" class="form-label">Departamento</label>
                         <select class="form-control" id="edit-departmentId" name="edit-departmentId" th:field="*{departmentId}" required>
-                            <option value="">Seleccione un Departamento</option>
-                            <option th:each="dep : ${department}"
+                            <option value="-1" disabled selected>Seleccione un Departamento</option>
+                            <option th:each="dep : ${departments}"
                                     th:value="${dep.id}"
                                     th:text="${dep.name}"></option>
                             </select>
@@ -38,19 +38,19 @@
                     <div class="mb-3">
                         <label for="edit-rol" class="form-label">Rol</label>
                         <select class="form-control" id="edit-rol" name="edit-rol" th:field="*{rolId}" required>
-                            <option value="">Seleccione un Rol</option>
-                            <option th:each="r : ${rol}"
+                            <option value="-1" disabled selected >Seleccione un Rol</option>
+                            <option th:each="r : ${roles}"
                                     th:value="${r.id}"
-                                    th:text="${r.name}"></option>
+                                    th:text="${r.type}"></option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label for="edit-scheduleId" class="form-label">Franja horaria</label>
                         <select class="form-control" id="edit-scheduleId" name="edit-scheduleId" th:field="*{scheduleId}" required>
-                            <option value="">Seleccione una Franja horaria</option>
-                            <option th:each="sch : ${schedule}"
+                            <option value="-1" disabled selected>Seleccione una Franja horaria</option>
+                            <option th:each="sch : ${schedules}"
                                     th:value="${sch.id}"
-                                    th:text="${sch.name}"></option>
+                                    th:text="${sch.workingType.name}"></option>
                         </select>
                     </div>
                     <div class="modal-footer">

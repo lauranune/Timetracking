@@ -1,11 +1,16 @@
 package com.nunegal.timetracking.service;
 
 import com.nunegal.timetracking.dto.EmployeeDto;
+import com.nunegal.timetracking.entity.Department;
 import com.nunegal.timetracking.entity.Employee;
+import com.nunegal.timetracking.entity.Rol;
+import com.nunegal.timetracking.entity.Schedule;
 import com.nunegal.timetracking.mapper.EmployeeMapper;
+import com.nunegal.timetracking.repository.DepartmentRepository;
 import com.nunegal.timetracking.repository.EmployeeRepository;
+import com.nunegal.timetracking.repository.RolRepository;
+import com.nunegal.timetracking.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.Normalizer;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,31 +29,40 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
     private EmployeeRepository employeeRepository;
 
     @Autowired
+    private DepartmentRepository departmentRepository;
+
+    @Autowired
+    private RolRepository rolRepository;
+
+    @Autowired
+    private ScheduleRepository scheduleRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private EmployeeMapper employeeMapper;
+
 
     // Autenticación para Spring Security
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Employee employee = employeeRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-        if (employee.getRol() == null) {
-            System.out.println(" El empleado no tiene un rol asignado.");
-        } else {
-            System.out.println(" Rol ID: " + employee.getRol().getId());
-            System.out.println(" Rol TYPE: " + employee.getRol().getType());
+
+        String role = "USER";
+        if (employee.getRol() != null && employee.getRol().getType() != null) {
+            role = employee.getRol().getType();
         }
-        return new User(
-                employee.getUsername(),
-                employee.getPassword(),
-                employee.isEnabled(),
-                true,
-                true,
-                true,
-                List.of(new SimpleGrantedAuthority("ROLE_" + employee.getRol().getType()))
-        );
+        return User.builder()
+                .username(employee.getUsername())
+                .password(employee.getPassword())
+                .disabled(!employee.isEnabled())
+                .accountExpired(false)
+                .credentialsExpired(false)
+                .accountLocked(false)
+                .authorities("ROLE_" + role)
+                .build();
     }
 
     @Override
@@ -55,23 +70,38 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
         if (existsByUsername(employeeDto.getUsername())) {
             throw new RuntimeException("El usuario ya existe");
         }
-        Employee employee= employeeMapper.toEntity(employeeDto);
+        employeeDto.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
+        Employee employee = employeeMapper.toEntity(employeeDto);
         employeeRepository.save(employee);
         return employeeMapper.toEmployeeDto(employee);
     }
 
     @Override
     public EmployeeDto update(EmployeeDto employeeDto) {
-        if (!employeeRepository.existsById(employeeDto.getId())) {
-            throw new RuntimeException("Empleado no encontrado");
-        }
-        employeeDto.setPassword(encryptPassword(employeeDto.getPassword()));
-        Employee updated = employeeRepository.save(employeeMapper.toEntity(employeeDto));
+        Employee existing = employeeRepository.findById(employeeDto.getId())
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+
+        Department department = departmentRepository.findById(employeeDto.getDepartmentId())
+                .orElseThrow(() -> new RuntimeException("Departamento no encontrado"));
+        Rol rol = rolRepository.findById(employeeDto.getRolId())
+                .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
+        Schedule schedule = scheduleRepository.findById(employeeDto.getScheduleId())
+                .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
+
+        existing.setName(employeeDto.getName());
+        existing.setSurname(employeeDto.getSurname());
+        existing.setDepartment(department);
+        existing.setRol(rol);
+        existing.setSchedule(schedule);
+
+        employeeMapper.updateEmployee(existing, employeeDto);
+
+        Employee updated = employeeRepository.save(existing);
         return employeeMapper.toEmployeeDto(updated);
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(Integer id) {
         employeeRepository.deleteById(id);
     }
 
@@ -84,8 +114,8 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
     }
 
     @Override
-    public EmployeeDto findById(int id) {
-        return employeeRepository.findById((int) id)
+    public EmployeeDto findById(Integer id) {
+        return employeeRepository.findById(id)
                 .map(employeeMapper::toEmployeeDto)
                 .orElse(null);
     }
@@ -105,5 +135,18 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
     @Override
     public String encryptPassword(String rawPassword) {
         return passwordEncoder.encode(rawPassword);
+    }
+
+    @Override
+    public String generateUniqueUsername(String name, String surname) {
+        String normalizedName = Normalizer.normalize(name, Normalizer.Form.NFD)
+                .replaceAll("[^\\p{ASCII}]", "")
+                .toLowerCase();
+        String normalizedSurname = Normalizer.normalize(surname, Normalizer.Form.NFD)
+                .replaceAll("[^\\p{ASCII}]", "")
+                .toLowerCase();
+
+        return (normalizedName.charAt(0) + normalizedSurname)
+                .replaceAll("\\s+", "");
     }
 }
