@@ -23,7 +23,8 @@ public class UserController {
 
     @GetMapping("/index")
     public String index(Model model, Principal principal) {
-        model.addAttribute("username", principal.getName());
+        EmployeeDto employee = employeeService.findByUsername(principal.getName());
+        model.addAttribute("employee", employee);
         return "user/index";
     }
 

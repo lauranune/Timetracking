@@ -68,7 +68,8 @@ public class EmployeeDto implements Serializable {
 
     //Constructor para crear nuevos empleados
 
-    public EmployeeDto(String name, String surname, String username, boolean enabled, String password, int departmentId, int rolId, int scheduleId) {
+    public EmployeeDto(String name, String surname, String username, boolean enabled,
+                       String password, int departmentId, int rolId, int scheduleId) {
         this.name = name;
         this.surname = surname;
         this.username = username;

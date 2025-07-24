@@ -16,9 +16,64 @@
 </nav>
 <section class="container-fluid">
     <div class="row">
-        <h1>Bienvenido: <span th:text="${username}"></span></h1>
+        <h1>Bienvenido: <span th:text="${employee.name} + ' ' + ${employee.surname}"></span></h1>
     </div>
 </section>
+<section class="container-fluid">
+    <div class="row d-flex justify-content-center px-3">
+        <h2>Información del usuario</h2>
+        <table class="w-25 table table-striped table-bordered" id="userTable">
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Departamento</th>
+                <th>Rol</th>
+                <th>Horario</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td th:text="${employee.name}"></td>
+                <td th:text="${employee.surname}"></td>
+                <td th:text="${employee.departmentName}"></td>
+                <td th:text="${employee.rolType}"></td>
+                <td th:text="${employee.scheduleName}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+<section class="container-fluid">
+    <div class="row d-flex justify-content-center px-3">
+        <h2>Fichaje Entrada</h2>
+        <div class="alert alert-warning" role="alert">
+            <form action="/fichar" class="d-inline" method="post">
+                <input name="accion" type="hidden" value="entrada">
+                <button class="btn btn-primary" type="submit">Fichar entrada</button>
+            </form>
+            <form action="/fichar" class="d-inline" method="post">
+                <input name="accion" type="hidden" value="salida">
+                <button class="btn btn-danger" type="submit">Fichar salida</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row d-flex justify-content-center px-3">
+        <h2>Fichaje Pausas</h2>
+        <div class="alert alert-warning" role="alert">
+            <form action="/fichar" class="d-inline" method="post">
+                <input name="accion" type="hidden" value="desayuno">
+                <button class="btn btn-primary" type="submit">Fichar desayuno</button>
+            </form>
+            <form action="/fichar" class="d-inline" method="post">
+                <input name="accion" type="hidden" value="comida">
+                <button class="btn btn-primary" type="submit">Fichar comida</button>
+            </form>
+        </div>
+    </div>
+</section>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
