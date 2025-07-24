@@ -7,11 +7,11 @@ import com.nunegal.timetracking.service.RolService;
 import com.nunegal.timetracking.service.ScheduleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,8 +33,7 @@ public class AdminController {
     private ScheduleService scheduleService;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Value("${app.default.password}")
-    private String defaultEmployeePassword;
+
 
     @GetMapping("/index")
     public String index(Model model, Principal principal) {
@@ -45,7 +44,7 @@ public class AdminController {
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable int id, Model model) {
+    public String delete(@PathVariable Integer id) {
         employeeService.delete(id);
         return "redirect:/admin/index";
     }
@@ -67,6 +66,14 @@ public class AdminController {
 
     @PostMapping("/edit")
     public String edit(@ModelAttribute("employee") @Valid EmployeeDto employee, Model model, BindingResult result) {
+        if (StringUtils.hasText(employee.getPassword())) {
+            if (!employee.isPasswordConfirmed()) {
+                result.rejectValue("confirmPassword", "error.employee", "Las contraseñas no coinciden");
+            }
+        } else {
+            employee.setPassword(null);
+        }
+
         if (result.hasErrors()) {
             model.addAttribute("employee", employee);
             model.addAttribute("departments", departmentService.findAll());
@@ -84,12 +91,15 @@ public class AdminController {
         model.addAttribute("departments", departmentService.findAll());
         model.addAttribute("roles", rolService.findAll());
         model.addAttribute("schedules", scheduleService.findAll());
-        model.addAttribute("defaultPassword", defaultEmployeePassword);
         return "admin/formNewUser :: content";
     }
 
     @PostMapping("/new")
     public String newEmployee(@ModelAttribute("employee") @Valid EmployeeDto employee, BindingResult result, Model model) {
+        if (!employee.isPasswordConfirmed()) {
+            result.rejectValue("confirmPassword", "error.employee", "Las contraseñas no coinciden");
+        }
+
         if (result.hasErrors()) {
             model.addAttribute("departments", departmentService.findAll());
             model.addAttribute("roles", rolService.findAll());
@@ -102,9 +112,7 @@ public class AdminController {
                     employee.getSurname()
             ));
         }
-        if (employee.getPassword() == null || employee.getPassword().isEmpty()) {
-            employee.setPassword(passwordEncoder.encode(defaultEmployeePassword));
-        }
+
         employee.setEnabled(true);
         employeeService.save(employee);
         return "redirect:/admin/index";

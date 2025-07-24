@@ -10,13 +10,16 @@ import com.nunegal.timetracking.repository.DepartmentRepository;
 import com.nunegal.timetracking.repository.EmployeeRepository;
 import com.nunegal.timetracking.repository.RolRepository;
 import com.nunegal.timetracking.repository.ScheduleRepository;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.text.Normalizer;
 import java.util.List;
@@ -24,6 +27,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class EmployeeServiceImple implements EmployeeService, UserDetailsService {
+    @Value("${app.default.password:1234}")
+    private String defaultPassword;
 
     @Autowired
     private EmployeeRepository employeeRepository;
@@ -38,21 +43,20 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
     private ScheduleRepository scheduleRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private EmployeeMapper employeeMapper;
 
+    @Lazy
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // Autenticación para Spring Security
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Employee employee = employeeRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
 
-        String role = "USER";
-        if (employee.getRol() != null && employee.getRol().getType() != null) {
-            role = employee.getRol().getType();
+        if (employee.getRol() == null) {
+            throw new IllegalStateException("El usuario no tiene rol asignado: " + username);
         }
         return User.builder()
                 .username(employee.getUsername())
@@ -61,7 +65,7 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
                 .accountExpired(false)
                 .credentialsExpired(false)
                 .accountLocked(false)
-                .authorities("ROLE_" + role)
+                .authorities("ROLE_" + employee.getRol().getType().toLowerCase())
                 .build();
     }
 
@@ -70,9 +74,17 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
         if (existsByUsername(employeeDto.getUsername())) {
             throw new RuntimeException("El usuario ya existe");
         }
-        employeeDto.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
+        if (employeeDto.getPassword() == null || employeeDto.getPassword().isEmpty()) {
+            employeeDto.setPassword(passwordEncoder.encode(defaultPassword));
+        } else {
+            employeeDto.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
+        }
+
+        employeeDto.setEnabled(true);
+
         Employee employee = employeeMapper.toEntity(employeeDto);
         employeeRepository.save(employee);
+
         return employeeMapper.toEmployeeDto(employee);
     }
 
@@ -96,6 +108,10 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
 
         employeeMapper.updateEmployee(existing, employeeDto);
 
+        if (StringUtils.hasText(employeeDto.getPassword())) {
+            existing.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
+        }
+        
         Employee updated = employeeRepository.save(existing);
         return employeeMapper.toEmployeeDto(updated);
     }

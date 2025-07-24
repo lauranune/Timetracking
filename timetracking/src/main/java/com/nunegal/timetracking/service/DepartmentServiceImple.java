@@ -18,7 +18,7 @@ public class DepartmentServiceImple implements DepartmentService {
     }
 
     @Override
-    public Department findById(int id){
+    public Department findById(int id) {
         return departmentRepository.findById(id)
                 .orElse(null);
     }

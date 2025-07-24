@@ -1,6 +1,7 @@
 package com.nunegal.timetracking.dto;
 
 import com.nunegal.timetracking.entity.Employee;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -22,9 +23,14 @@ public class EmployeeDto implements Serializable {
     private String surname;
 
     private boolean enabled;
-    
+
     private String username;
+    @NotEmpty(message = "La contraseña es obligatoria")
+    @Size(min = 4, max = 20, message = "La contraseña debe tener entre 4 y 20 caracteres")
     private String password;
+
+    @Transient
+    private String confirmPassword;
 
     @NotNull(message = "El departamento es obligatorio")
     private int departmentId;
@@ -45,6 +51,18 @@ public class EmployeeDto implements Serializable {
     }
 
     public EmployeeDto(Employee employee) {
+        this.id = employee.getId();
+        this.name = employee.getName();
+        this.surname = employee.getSurname();
+        this.username = employee.getUsername();
+        this.password = employee.getPassword();
+        this.enabled = employee.isEnabled();
+        this.departmentId = employee.getDepartment().getId();
+        this.departmentName = employee.getDepartment().getName();
+        this.rolId = employee.getRol().getId();
+        this.rolType = employee.getRol().getType();
+        this.scheduleId = employee.getSchedule().getId();
+        this.scheduleName = employee.getSchedule().getWorkingType().getName();
     }
 
 
@@ -174,5 +192,9 @@ public class EmployeeDto implements Serializable {
 
     public void setScheduleName(String name) {
         this.scheduleName = name;
+    }
+
+    public boolean isPasswordConfirmed() {
+        return password != null && !password.equals(confirmPassword);
     }
 }

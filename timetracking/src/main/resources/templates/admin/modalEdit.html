@@ -1,61 +1,85 @@
 <!DOCTYPE html>
-<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="modal fade" id="modalEditAdmin" th:fragment="modalEditAdmin" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalEdit" aria-hidden="true">
+<div aria-hidden="true" aria-labelledby="modalEdit" class="modal fade" data-bs-backdrop="static"
+     data-bs-keyboard="false" id="modalEditAdmin" tabindex="-1" th:fragment="modalEditAdmin">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Edita el trabajador</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
             </div>
             <div class="modal-body">
                 <form id="formEdit" th:action="@{/admin/edit}" th:method="post" th:object="${employee}">
-                    <input type="hidden" th:field="*{id}">
+                    <input th:field="*{id}" type="hidden">
+                    <input th:field="*{username}" type="hidden">
                     <div class="mb-3">
-                        <label for="edit-name" class="form-label">Nombre</label>
-                        <input type="text" class="form-control" id="edit-name" th:field="*{name}" required>
-                        <div class="alert alert-warning" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                        <label class="form-label" for="edit-name">Nombre</label>
+                        <input class="form-control" id="edit-name" required th:field="*{name}" type="text">
+                        <div class="alert alert-warning" th:errors="*{name}" th:if="${#fields.hasErrors('name')}"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="edit-surname" class="form-label">Apellido</label>
-                        <input type="text" class="form-control" id="edit-surname" th:field="*{surname}" required>
-                        <div class="alert alert-warning" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"></div>
+                        <label class="form-label" for="edit-surname">Apellido</label>
+                        <input class="form-control" id="edit-surname" required th:field="*{surname}" type="text">
+                        <div class="alert alert-warning" th:errors="*{surname}"
+                             th:if="${#fields.hasErrors('surname')}"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="edit-departmentId" class="form-label">Departamento</label>
-                        <select class="form-control" id="edit-departmentId" name="edit-departmentId" th:field="*{departmentId}" required>
-                            <option value="-1" disabled selected>Seleccione un Departamento</option>
+                        <label class="form-label" for="edit-departmentId">Departamento</label>
+                        <select class="form-control" id="edit-departmentId" name="edit-departmentId"
+                                required th:field="*{departmentId}">
+                            <option disabled selected value="-1">Seleccione un Departamento</option>
                             <option th:each="dep : ${departments}"
-                                    th:value="${dep.id}"
-                                    th:text="${dep.name}"></option>
-                            </select>
+                                    th:text="${dep.name}"
+                                    th:value="${dep.id}"></option>
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label for="edit-rol" class="form-label">Rol</label>
-                        <select class="form-control" id="edit-rol" name="edit-rol" th:field="*{rolId}" required>
-                            <option value="-1" disabled selected >Seleccione un Rol</option>
+                        <label class="form-label" for="edit-rol">Rol</label>
+                        <select class="form-control" id="edit-rol" name="edit-rol" required th:field="*{rolId}">
+                            <option disabled selected value="-1">Seleccione un Rol</option>
                             <option th:each="r : ${roles}"
-                                    th:value="${r.id}"
-                                    th:text="${r.type}"></option>
+                                    th:text="${r.type}"
+                                    th:value="${r.id}"></option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="edit-scheduleId" class="form-label">Franja horaria</label>
-                        <select class="form-control" id="edit-scheduleId" name="edit-scheduleId" th:field="*{scheduleId}" required>
-                            <option value="-1" disabled selected>Seleccione una Franja horaria</option>
+                        <label class="form-label" for="edit-scheduleId">Franja horaria</label>
+                        <select class="form-control" id="edit-scheduleId" name="edit-scheduleId"
+                                required th:field="*{scheduleId}">
+                            <option disabled selected value="-1">Seleccione una Franja horaria</option>
                             <option th:each="sch : ${schedules}"
-                                    th:value="${sch.id}"
-                                    th:text="${sch.workingType.name}"></option>
+                                    th:text="${sch.workingType.name}"
+                                    th:value="${sch.id}"></option>
                         </select>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" id="edit-enabled" th:field="*{enabled}"
+                               type="checkbox">
+                        <label class="form-check-label" for="edit-enabled">
+                            Usuario habilitado
+                        </label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="edit-password">Nueva Contraseña</label>
+                        <input class="form-control" id="edit-password"
+                               name="password" placeholder="Dejar vacío para no cambiar"
+                               type="password">
+                        <small class="form-text text-muted">Mínimo 4 caracteres</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="edit-confirmPassword">Confirmar Nueva Contraseña</label>
+                        <input class="form-control" id="edit-confirmPassword"
+                               name="confirmPassword" type="password">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cerrar</button>
+                        <button class="btn btn-primary" type="submit">Guardar</button>
                     </div>
                 </form>
             </div>

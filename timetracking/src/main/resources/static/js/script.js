@@ -83,7 +83,7 @@ $(document).ready(function () {
 
         $('#formNewUser').on('submit', function (e) {
             e.preventDefault();
-
+            
             $.ajax({
                 url: $(this).attr('action'),
                 method: 'POST',

@@ -1,7 +1,6 @@
 package com.nunegal.timetracking.config;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,7 +8,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,18 +18,27 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private final UserDetailsService userDetailsService;
+
+    @Autowired
+    public SecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, UserDetailsService userDetailService) throws Exception {
-        return http
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/css/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("admin")
-                        .requestMatchers("/user/**").hasRole("user")
+                        .requestMatchers("/login", "/style.css", "/css/**").permitAll()
+                        .requestMatchers("/admin/**").hasAnyAuthority("ROLE_admin", "ROLE_ADMIN")
+                        .requestMatchers("/user/**").hasAnyAuthority("ROLE_user", "ROLE_USER")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .failureUrl("/login?error=true")
+                        .defaultSuccessUrl("/", true)
                         .successHandler(customAuthenticationSuccessHandler())
                         .permitAll()
                 )
@@ -41,25 +48,25 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .exceptionHandling(exception -> exception
-                        .accessDeniedPage("/access-denied"))
-                .userDetailsService(userDetailService)
-                .build();
+                        .accessDeniedPage("/access-denied"));
+        return http.build();
     }
 
+
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager
+            (AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
     public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
-        return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
+        return (request, response, authentication) -> {
             for (GrantedAuthority authority : authentication.getAuthorities()) {
-                String role = authority.getAuthority();
-                if (role.equals("ROLE_admin")) {
+                if (authority.getAuthority().equals("ROLE_admin")) {
                     response.sendRedirect("/admin/index");
                     return;
-                } else if (role.equals("ROLE_user")) {
+                } else if (authority.getAuthority().equals("ROLE_user")) {
                     response.sendRedirect("/user/index");
                     return;
                 }
