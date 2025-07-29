@@ -1,0 +1,27 @@
+/**Global Config **/
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: #e4e8f1;
+
+    .btn-primary {
+        background-color: #7293f6;
+        color: #ffffff;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #ffffff;
+        border-color: #7293f6;
+        color: #7293f6;
+    }
+
+    .btn-danger {
+        background-color: #c6372c;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        background-color: #fa1001;
+        border-color: #c6372c;
+    }
+}

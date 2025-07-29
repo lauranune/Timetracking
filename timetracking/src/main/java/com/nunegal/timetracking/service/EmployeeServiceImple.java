@@ -1,15 +1,11 @@
 package com.nunegal.timetracking.service;
 
 import com.nunegal.timetracking.dto.EmployeeDto;
-import com.nunegal.timetracking.entity.Department;
-import com.nunegal.timetracking.entity.Employee;
-import com.nunegal.timetracking.entity.Rol;
-import com.nunegal.timetracking.entity.Schedule;
+import com.nunegal.timetracking.dto.ScheduleDto;
+import com.nunegal.timetracking.entity.*;
 import com.nunegal.timetracking.mapper.EmployeeMapper;
-import com.nunegal.timetracking.repository.DepartmentRepository;
-import com.nunegal.timetracking.repository.EmployeeRepository;
-import com.nunegal.timetracking.repository.RolRepository;
-import com.nunegal.timetracking.repository.ScheduleRepository;
+import com.nunegal.timetracking.mapper.ScheduleMapper;
+import com.nunegal.timetracking.repository.*;
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.text.Normalizer;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +40,13 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
     private ScheduleRepository scheduleRepository;
 
     @Autowired
+    private WorkingTypeRepository workingTypeRepository;
+
+    @Autowired
     private EmployeeMapper employeeMapper;
+
+    @Autowired
+    private ScheduleMapper scheduleMapper;
 
     @Lazy
     @Autowired
@@ -97,21 +100,18 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
                 .orElseThrow(() -> new RuntimeException("Departamento no encontrado"));
         Rol rol = rolRepository.findById(employeeDto.getRolId())
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
-        Schedule schedule = scheduleRepository.findById(employeeDto.getScheduleId())
-                .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
 
         existing.setName(employeeDto.getName());
         existing.setSurname(employeeDto.getSurname());
         existing.setDepartment(department);
         existing.setRol(rol);
-        existing.setSchedule(schedule);
 
         employeeMapper.updateEmployee(existing, employeeDto);
 
         if (StringUtils.hasText(employeeDto.getPassword())) {
             existing.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
         }
-        
+
         Employee updated = employeeRepository.save(existing);
         return employeeMapper.toEmployeeDto(updated);
     }
@@ -164,5 +164,59 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
 
         return (normalizedName.charAt(0) + normalizedSurname)
                 .replaceAll("\\s+", "");
+    }
+
+    @Override
+    public void updateSchedule(int employeeId, ScheduleDto scheduleDto) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+
+        Schedule schedule = scheduleRepository.findByEmployeeIdAndDate(employeeId, scheduleDto.getDate());
+
+        if (schedule == null) {
+            schedule = scheduleMapper.toEntity(scheduleDto);
+            schedule.setEmployee(employee);
+        } else {
+            schedule.setEntry(scheduleDto.getEntry());
+            schedule.setExit(scheduleDto.getExit());
+            schedule.setPauseEntry(scheduleDto.getPauseEntry());
+            schedule.setPauseExit(scheduleDto.getPauseExit());
+            schedule.setLunchEntry(scheduleDto.getLunchEntry());
+            schedule.setLunchExit(scheduleDto.getLunchExit());
+        }
+
+        scheduleRepository.save(schedule);
+    }
+
+    @Override
+    public ScheduleDto findTodaySchedule(int employeeId, LocalDate today) {
+        Schedule schedule = scheduleRepository.findByEmployeeIdAndDate(employeeId, today);
+        return scheduleMapper.toScheduleDto(schedule);
+    }
+
+    @Override
+    public ScheduleDto createSchedule(int employeeId, ScheduleDto scheduleDto) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+
+        Schedule schedule = new Schedule();
+        schedule.setEmployee(employee);
+        schedule.setDate(scheduleDto.getDate());
+        schedule.setEntry(scheduleDto.getEntry());
+        schedule.setExit(scheduleDto.getExit());
+        schedule.setPauseEntry(scheduleDto.getPauseEntry());
+        schedule.setPauseExit(scheduleDto.getPauseExit());
+        schedule.setLunchEntry(scheduleDto.getLunchEntry());
+        schedule.setLunchExit(scheduleDto.getLunchExit());
+        schedule.setWorkingType(employee.getWorkingType());
+
+        if (scheduleDto.getWorkingTypeId() != 0) {
+            WorkingType workingType = workingTypeRepository.findById(scheduleDto.getWorkingTypeId())
+                    .orElseThrow(() -> new RuntimeException("Tipo de jornada no encontrado"));
+            schedule.setWorkingType(workingType);
+        }
+
+        Schedule savedSchedule = scheduleRepository.save(schedule);
+        return scheduleMapper.toScheduleDto(savedSchedule);
     }
 }

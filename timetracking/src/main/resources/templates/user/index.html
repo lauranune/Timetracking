@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>User index</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 <nav class="navbar navbar-dark sticky-top container-fluid">
@@ -16,12 +16,13 @@
 </nav>
 <section class="container-fluid">
     <div class="row">
-        <h1>Bienvenido: <span th:text="${employee.name} + ' ' + ${employee.surname}"></span></h1>
+        <h1>Bienvenido: <span th:text="${employee.name + ' ' + employee.surname}"></span></h1>
     </div>
 </section>
-<section class="container-fluid">
+<section class="container-fluid text-center my-5">
     <div class="row d-flex justify-content-center px-3">
         <h2>Información del usuario</h2>
+        <br>
         <table class="w-25 table table-striped table-bordered" id="userTable">
             <thead>
             <tr>
@@ -38,37 +39,49 @@
                 <td th:text="${employee.surname}"></td>
                 <td th:text="${employee.departmentName}"></td>
                 <td th:text="${employee.rolType}"></td>
-                <td th:text="${employee.scheduleName}"></td>
+                <td th:text="${employee.workingTypeName}"></td>
             </tr>
             </tbody>
         </table>
     </div>
 </section>
-<section class="container-fluid">
+<section class="container-fluid text-center my-5">
     <div class="row d-flex justify-content-center px-3">
         <h2>Fichaje Entrada</h2>
-        <div class="alert alert-warning" role="alert">
-            <form action="/fichar" class="d-inline" method="post">
-                <input name="accion" type="hidden" value="entrada">
-                <button class="btn btn-primary" type="submit">Fichar entrada</button>
+        <div class="alert alert-warning w-50" role="alert">
+            <form action="/user/clockin" class="d-inline" method="post">
+                <input name="_csrf" th:value="${_csrf.token}" type="hidden">
+                <input name="accion"
+                       th:value="${todaySchedule == null  or todaySchedule.entry == null ? 'entrada' : 'salida'}"
+                       type="hidden">
+                <button class="btn"
+                        th:classappend="${todaySchedule == null or todaySchedule.entry == null ? 'btn-primary' : 'btn-danger'}"
+                        th:text="${todaySchedule == null or todaySchedule.entry == null ? 'Fichar Entrada' :
+                          (todaySchedule.exit == null ? 'Fichar salida' : 'Jornada Finalizada')}">
+                </button>
             </form>
-            <form action="/fichar" class="d-inline" method="post">
+            <form action="/user/clockin" class="d-inline" method="post">
                 <input name="accion" type="hidden" value="salida">
-                <button class="btn btn-danger" type="submit">Fichar salida</button>
             </form>
         </div>
     </div>
 
-    <div class="row d-flex justify-content-center px-3">
+    <div class="row d-flex justify-content-center px-3" th:if="${hasPause}">
         <h2>Fichaje Pausas</h2>
-        <div class="alert alert-warning" role="alert">
-            <form action="/fichar" class="d-inline" method="post">
+        <div class="alert alert-warning w-50" role="alert">
+            <form action="/user/clockin" class="d-inline" method="post">
+                <input name="_csrf" th:value="${_csrf.token}" type="hidden">
                 <input name="accion" type="hidden" value="desayuno">
-                <button class="btn btn-primary" type="submit">Fichar desayuno</button>
+                <button class="btn btn-primary" th:text="${todaySchedule.pauseEntry == null ? 'Iniciar pausa desayuno' :
+                        (todaySchedule.pauseExit== null ? 'Finalizar pausa desayuno' : 'Pausa desayuno realizada')}">
+                </button>
             </form>
-            <form action="/fichar" class="d-inline" method="post">
+            <form action="/user/clockin" class="d-inline" method="post">
+                <input name="_csrf" th:value="${_csrf.token}" type="hidden">
                 <input name="accion" type="hidden" value="comida">
-                <button class="btn btn-primary" type="submit">Fichar comida</button>
+                <button class="btn btn-primary" th:text="${todaySchedule.lunchEntry == null ? 'Iniciar pausa comida' :
+                        (todaySchedule.lunchExit== null ? 'Finalizar pausa comida' : 'Pausa comida realizada')}">
+                </button>
             </form>
         </div>
     </div>

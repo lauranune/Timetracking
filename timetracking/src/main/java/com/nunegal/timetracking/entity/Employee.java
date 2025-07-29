@@ -2,6 +2,8 @@ package com.nunegal.timetracking.entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "employee")
 public class Employee {
@@ -27,25 +29,29 @@ public class Employee {
     private Rol rol;
 
     @ManyToOne
-    @JoinColumn(name = "schedule_idschedule")
-    private Schedule schedule;
+    @JoinColumn(name = "working_type_idworking_type")
+    private WorkingType workingType;
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Schedule> schedules;
 
     public Employee() {
     }
 
     //Constructor de pruebas
     public Employee(String username, String password, boolean enabled, Department department, Rol rol,
-                    Schedule schedule) {
+                    List<Schedule> schedules, WorkingType workingType) {
         this.username = username;
         this.password = password;
         this.enabled = enabled;
         this.department = department;
         this.rol = rol;
-        this.schedule = schedule;
+        this.schedules = schedules;
+        this.workingType = workingType;
     }
 
     public Employee(int id, String name, String surname, String username, String password, boolean enabled,
-                    Department department, Rol rol, Schedule schedule) {
+                    Department department, Rol rol, List<Schedule> schedules, WorkingType workingType) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -54,7 +60,8 @@ public class Employee {
         this.enabled = enabled;
         this.department = department;
         this.rol = rol;
-        this.schedule = schedule;
+        this.schedules = schedules;
+        this.workingType = workingType;
     }
 
     public int getId() {
@@ -121,12 +128,20 @@ public class Employee {
         this.rol = rol;
     }
 
-    public Schedule getSchedule() {
-        return schedule;
+    public List<Schedule> getSchedules() {
+        return schedules;
     }
 
-    public void setSchedule(Schedule schedule) {
-        this.schedule = schedule;
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
+    }
+
+    public WorkingType getWorkingType() {
+        return workingType;
+    }
+
+    public void setWorkingType(WorkingType workingType) {
+        this.workingType = workingType;
     }
 
     @Override

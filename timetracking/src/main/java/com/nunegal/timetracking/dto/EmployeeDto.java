@@ -8,6 +8,9 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class EmployeeDto implements Serializable {
     private int id;
@@ -42,9 +45,11 @@ public class EmployeeDto implements Serializable {
 
     private String rolType;
 
-    private int scheduleId;
+    private int workingTypeId;
 
-    private String scheduleName;
+    private String workingTypeName;
+
+    private List<ScheduleDto> schedules;
 
 
     public EmployeeDto() {
@@ -61,42 +66,9 @@ public class EmployeeDto implements Serializable {
         this.departmentName = employee.getDepartment().getName();
         this.rolId = employee.getRol().getId();
         this.rolType = employee.getRol().getType();
-        this.scheduleId = employee.getSchedule().getId();
-        this.scheduleName = employee.getSchedule().getWorkingType().getName();
-    }
-
-
-    //Constructor para crear nuevos empleados
-
-    public EmployeeDto(String name, String surname, String username, boolean enabled,
-                       String password, int departmentId, int rolId, int scheduleId) {
-        this.name = name;
-        this.surname = surname;
-        this.username = username;
-        this.enabled = enabled;
-        this.password = password;
-        this.departmentId = departmentId;
-        this.rolId = rolId;
-        this.scheduleId = scheduleId;
-    }
-
-    //Constructor completo para convertir entidad
-
-    public EmployeeDto(int id, String name, String surname, String username, String password,
-                       boolean enabled, int departmentId, String departmentName, int rolId, String rolType,
-                       int scheduleId, String scheduleName) {
-        this.id = id;
-        this.name = name;
-        this.surname = surname;
-        this.username = username;
-        this.password = password;
-        this.enabled = enabled;
-        this.departmentId = departmentId;
-        this.departmentName = departmentName;
-        this.rolId = rolId;
-        this.rolType = rolType;
-        this.scheduleId = scheduleId;
-        this.scheduleName = scheduleName;
+        this.workingTypeName = employee.getWorkingType().getName();
+        this.workingTypeId = employee.getWorkingType().getId();
+        this.schedules = employee.getSchedules().stream().map(ScheduleDto::new).collect(Collectors.toList());
     }
 
     public int getId() {
@@ -123,6 +95,14 @@ public class EmployeeDto implements Serializable {
         this.surname = surname;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -139,12 +119,12 @@ public class EmployeeDto implements Serializable {
         this.password = password;
     }
 
-    public boolean getEnabled() {
-        return enabled;
+    public String getConfirmPassword() {
+        return confirmPassword;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
 
     public int getDepartmentId() {
@@ -179,20 +159,28 @@ public class EmployeeDto implements Serializable {
         this.rolType = rolType;
     }
 
-    public int getScheduleId() {
-        return scheduleId;
+    public int getWorkingTypeId() {
+        return workingTypeId;
     }
 
-    public void setScheduleId(int scheduleId) {
-        this.scheduleId = scheduleId;
+    public void setWorkingTypeId(int workingTypeId) {
+        this.workingTypeId = workingTypeId;
     }
 
-    public String getScheduleName() {
-        return scheduleName;
+    public String getWorkingTypeName() {
+        return workingTypeName;
     }
 
-    public void setScheduleName(String name) {
-        this.scheduleName = name;
+    public void setWorkingTypeName(String workingTypeName) {
+        this.workingTypeName = workingTypeName;
+    }
+
+    public List<ScheduleDto> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(List<ScheduleDto> schedules) {
+        this.schedules = schedules;
     }
 
     public boolean isPasswordConfirmed() {
