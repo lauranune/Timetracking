@@ -184,6 +184,6 @@ public class EmployeeDto implements Serializable {
     }
 
     public boolean isPasswordConfirmed() {
-        return password != null && !password.equals(confirmPassword);
+        return password != null && password.equals(confirmPassword);
     }
 }

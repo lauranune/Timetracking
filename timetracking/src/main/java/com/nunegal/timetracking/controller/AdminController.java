@@ -1,10 +1,7 @@
 package com.nunegal.timetracking.controller;
 
 import com.nunegal.timetracking.dto.EmployeeDto;
-import com.nunegal.timetracking.service.DepartmentService;
-import com.nunegal.timetracking.service.EmployeeService;
-import com.nunegal.timetracking.service.RolService;
-import com.nunegal.timetracking.service.ScheduleService;
+import com.nunegal.timetracking.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +28,8 @@ public class AdminController {
     private RolService rolService;
     @Autowired
     private ScheduleService scheduleService;
+    @Autowired
+    private WorkingTypeService workingTypeService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -60,14 +59,15 @@ public class AdminController {
         model.addAttribute("employee", employee);
         model.addAttribute("departments", departmentService.findAll());
         model.addAttribute("roles", rolService.findAll());
-        model.addAttribute("schedules", scheduleService.findAll());
+        model.addAttribute("workingTypes", workingTypeService.findAll());
         return "admin/modalEdit :: modalEditAdmin";
     }
 
     @PostMapping("/edit")
     public String edit(@ModelAttribute("employee") @Valid EmployeeDto employee, Model model, BindingResult result) {
+
         if (StringUtils.hasText(employee.getPassword())) {
-            if (!employee.isPasswordConfirmed()) {
+            if (!employee.getPassword().equals(employee.getConfirmPassword())) {
                 result.rejectValue("confirmPassword", "error.employee", "Las contraseñas no coinciden");
             }
         } else {
@@ -78,10 +78,11 @@ public class AdminController {
             model.addAttribute("employee", employee);
             model.addAttribute("departments", departmentService.findAll());
             model.addAttribute("roles", rolService.findAll());
-            model.addAttribute("schedules", scheduleService.findAll());
+            model.addAttribute("workingTypes", workingTypeService.findAll());
             return "admin/modalEdit :: modalEditAdmin";
         }
-        employeeService.update(employee);
+        EmployeeDto updated = employeeService.update(employee);
+        System.out.println("Datos actualizados: " + updated.toString());
         return "redirect:/admin/index";
     }
 
@@ -90,7 +91,7 @@ public class AdminController {
         model.addAttribute("employee", new EmployeeDto());
         model.addAttribute("departments", departmentService.findAll());
         model.addAttribute("roles", rolService.findAll());
-        model.addAttribute("schedules", scheduleService.findAll());
+        model.addAttribute("workingTypes", workingTypeService.findAll());
         return "admin/formNewUser :: content";
     }
 
@@ -103,7 +104,7 @@ public class AdminController {
         if (result.hasErrors()) {
             model.addAttribute("departments", departmentService.findAll());
             model.addAttribute("roles", rolService.findAll());
-            model.addAttribute("schedules", scheduleService.findAll());
+            model.addAttribute("workingTypes", workingTypeService.findAll());
             return "admin/formNewUser :: content";
         }
         if (employee.getUsername() == null || employee.getUsername().isEmpty()) {

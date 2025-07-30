@@ -13,10 +13,24 @@
             <h1>Portal del empleado</h1>
         </div>
     </div>
+    <div class="row w-100 h-50 align-items-center justify-content-between px-3">
+        <li class="nav-item">
+            <a class="nav-link" th:href="@{/admin/index}">Panel de Administración</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" th:href="@{/user/index}">Mi Panel de Usuario</a>
+        </li>
+    </div>
 </nav>
-<section>
-    <h1>Bienvenido: <span th:text="${adminName}"></span></h1>
+<section class="container-fluid">
+    <div class="row">
+        <h1>Bienvenido: <span th:text="${employee.name + ' ' + employee.surname}"></span></h1>
+    </div>
+</section>
+<section class="container-fluid text-center my-5">
     <div class="row d-flex justify-content-center px-3">
+        <h2>Información de los trabajadores</h2>
+        <br>
         <table class="w-25 table table-striped table-bordered" id="employeesAdmin">
             <thead>
             <tr>
@@ -37,7 +51,7 @@
                 <td th:text="${employee.username}"></td>
                 <td th:text="${employee.departmentName}"></td>
                 <td th:text="${employee.rolType}"></td>
-                <td th:text="${employee.scheduleName}"></td>
+                <td th:text="${employee.workingTypeName}"></td>
                 <td>
                     <button class="btn btn-danger delete-btn" th:data-id="${employee.id}">Borrar</button>
                 </td>
@@ -49,7 +63,7 @@
                                 data-surname=${employee.surname},
                                 data-department=${employee.departmentId},
                                 data-rol=${employee.rolType},
-                                data-schedule=${employee.scheduleId}"
+                                data-schedule=${employee.workingTypeId}"
                             type="button">
                         Editar
                     </button>

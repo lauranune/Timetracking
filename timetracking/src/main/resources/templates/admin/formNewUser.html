@@ -49,12 +49,13 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="schedule">Horario</label>
-                        <select class="form-select" id="schedule" name="scheduleId" required th:field="*{scheduleId}">
+                        <label class="form-label" for="workingType">Horario</label>
+                        <select class="form-select" id="workingType" name="workingTypeId" required
+                                th:field="*{workingTypeId}">
                             <option disabled selected value="-1">Seleccione un horario</option>
-                            <option th:each="schedule : ${schedules}"
-                                    th:text="${schedule.workingType.name}"
-                                    th:value="${schedule.id}"></option>
+                            <option th:each="wt : ${workingTypes}"
+                                    th:text="${wt.name}"
+                                    th:value="${wt.id}"></option>
                         </select>
                     </div>
                     <div class="mb-3">

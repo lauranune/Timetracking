@@ -49,33 +49,31 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="edit-scheduleId">Franja horaria</label>
-                        <select class="form-control" id="edit-scheduleId" name="edit-scheduleId"
-                                required th:field="*{scheduleId}">
+                        <label class="form-label" for="edit-workingTypeId">Franja horaria</label>
+                        <select class="form-control" id="edit-workingTypeId" name="edit-workingTypeId"
+                                required th:field="*{workingTypeId}">
                             <option disabled selected value="-1">Seleccione una Franja horaria</option>
-                            <option th:each="sch : ${schedules}"
-                                    th:text="${sch.workingType.name}"
-                                    th:value="${sch.id}"></option>
+                            <option th:each="wt : ${workingTypes}"
+                                    th:text="${wt.name}"
+                                    th:value="${wt.id}"></option>
                         </select>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" id="edit-enabled" th:field="*{enabled}"
-                               type="checkbox">
+                        <input class="form-check-input" id="edit-enabled" th:field="*{enabled}" type="checkbox">
                         <label class="form-check-label" for="edit-enabled">
                             Usuario habilitado
                         </label>
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="edit-password">Nueva Contraseña</label>
-                        <input class="form-control" id="edit-password"
-                               name="password" placeholder="Dejar vacío para no cambiar"
-                               type="password">
+                        <input class="form-control" id="edit-password" placeholder="Dejar vacío para no cambiar"
+                               th:field="*{password}" type="password">
                         <small class="form-text text-muted">Mínimo 4 caracteres</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="edit-confirmPassword">Confirmar Nueva Contraseña</label>
                         <input class="form-control" id="edit-confirmPassword"
-                               name="confirmPassword" type="password">
+                               th:field="*{confirmPassword}" type="password">
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cerrar</button>

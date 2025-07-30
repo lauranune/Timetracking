@@ -43,6 +43,7 @@ public class UserController {
         return "user/index";
     }
 
+
     @PostMapping("/clockin")
     public String clockin(@RequestParam String accion, Principal principal) {
         EmployeeDto employee = employeeService.findByUsername(principal.getName());

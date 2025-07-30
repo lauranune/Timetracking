@@ -6,6 +6,7 @@ import com.nunegal.timetracking.entity.*;
 import com.nunegal.timetracking.mapper.EmployeeMapper;
 import com.nunegal.timetracking.mapper.ScheduleMapper;
 import com.nunegal.timetracking.repository.*;
+import jakarta.transaction.Transactional;
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class EmployeeServiceImple implements EmployeeService, UserDetailsService {
     @Value("${app.default.password:1234}")
     private String defaultPassword;
@@ -73,40 +75,47 @@ public class EmployeeServiceImple implements EmployeeService, UserDetailsService
     }
 
     @Override
+    @Transactional
     public EmployeeDto save(EmployeeDto employeeDto) {
-        if (existsByUsername(employeeDto.getUsername())) {
-            throw new RuntimeException("El usuario ya existe");
+        try {
+            if (existsByUsername(employeeDto.getUsername())) {
+                throw new RuntimeException("El usuario ya existe");
+            }
+            if (employeeDto.getPassword() == null || employeeDto.getPassword().isEmpty()) {
+                employeeDto.setPassword(passwordEncoder.encode(defaultPassword));
+            } else {
+                employeeDto.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
+            }
+
+            employeeDto.setEnabled(true);
+
+            Employee employee = employeeMapper.toEntity(employeeDto);
+            employeeRepository.save(employee);
+
+            return employeeMapper.toEmployeeDto(employee);
+        } catch (Exception e) {
+            System.err.println("Error al guardar empleado: " + e.getMessage());
+            throw e;
         }
-        if (employeeDto.getPassword() == null || employeeDto.getPassword().isEmpty()) {
-            employeeDto.setPassword(passwordEncoder.encode(defaultPassword));
-        } else {
-            employeeDto.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
-        }
-
-        employeeDto.setEnabled(true);
-
-        Employee employee = employeeMapper.toEntity(employeeDto);
-        employeeRepository.save(employee);
-
-        return employeeMapper.toEmployeeDto(employee);
     }
 
     @Override
     public EmployeeDto update(EmployeeDto employeeDto) {
         Employee existing = employeeRepository.findById(employeeDto.getId())
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
-
         Department department = departmentRepository.findById(employeeDto.getDepartmentId())
                 .orElseThrow(() -> new RuntimeException("Departamento no encontrado"));
         Rol rol = rolRepository.findById(employeeDto.getRolId())
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
+        WorkingType workingType = workingTypeRepository.findById(employeeDto.getWorkingTypeId())
+                .orElseThrow(() -> new RuntimeException("Jornada no encontrada"));
 
         existing.setName(employeeDto.getName());
         existing.setSurname(employeeDto.getSurname());
         existing.setDepartment(department);
         existing.setRol(rol);
-
-        employeeMapper.updateEmployee(existing, employeeDto);
+        existing.setWorkingType(workingType);
+        existing.setEnabled(employeeDto.isEnabled());
 
         if (StringUtils.hasText(employeeDto.getPassword())) {
             existing.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
