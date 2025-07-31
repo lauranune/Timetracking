@@ -18,7 +18,7 @@ import java.time.LocalTime;
 
 @Controller
 @RequestMapping("/user")
-@PreAuthorize("hasRole('user')")
+@PreAuthorize("hasAnyRole('user','admin')")
 public class UserController {
 
     @Autowired

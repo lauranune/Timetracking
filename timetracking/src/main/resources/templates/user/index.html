@@ -1,30 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>User index</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<nav class="navbar navbar-dark sticky-top container-fluid">
-    <div class="row w-100 h-50 align-items-center justify-content-between px-3" style="background-color: #f8f9fa;">
-        <div class="col-auto d-flex align-items-center">
-            <h1>Portal del empleado</h1>
+<nav class="navbar navbar-expand-lg navbar-light sticky-top shadow">
+    <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
+
+        <a class="navbar-brand fw-bold" href="#">
+            <i class="bi bi-people-fill me-2"></i>Portal del Empleado
+        </a>
+
+        <span class="text-black">
+            Bienvenido: <strong th:text="${employee.name + ' ' + employee.surname}"></strong>
+        </span>
+
+        <div class="d-flex align-items-center">
+            <div sec:authorize="hasRole('ROLE_admin') or hasRole('ROLE_ADMIN')">
+                <a class="btn btn-warning me-2" th:href="@{/admin/index}">
+                    <i class="bi bi-speedometer2"></i> Vista Administración
+                </a>
+            </div>
+            <form class="d-inline" method="post" th:action="@{/logout}">
+                <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden"/>
+                <button class="btn btn-danger" type="submit">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </button>
+            </form>
         </div>
     </div>
 </nav>
-<section class="container-fluid">
-    <div class="row">
-        <h1>Bienvenido: <span th:text="${employee.name + ' ' + employee.surname}"></span></h1>
-    </div>
-</section>
 <section class="container-fluid text-center my-5">
     <div class="row d-flex justify-content-center px-3">
-        <h2>Información del usuario</h2>
+        <h2>Información del Usuario</h2>
         <br>
-        <table class="w-25 table table-striped table-bordered" id="userTable">
-            <thead>
+        <table class="w-50 table table-striped table-bordered shadow">
+            <thead class="table-light">
             <tr>
                 <th>Nombre</th>
                 <th>Apellido</th>
@@ -48,7 +63,7 @@
 <section class="container-fluid text-center my-5">
     <div class="row d-flex justify-content-center px-3">
         <h2>Fichaje Entrada</h2>
-        <div class="alert alert-warning w-50" role="alert">
+        <div class="alert alert-warning w-50 shadow" role="alert">
             <form action="/user/clockin" class="d-inline" method="post">
                 <input name="_csrf" th:value="${_csrf.token}" type="hidden">
                 <input name="accion"
@@ -57,40 +72,34 @@
                 <button class="btn"
                         th:classappend="${todaySchedule == null or todaySchedule.entry == null ? 'btn-primary' : 'btn-danger'}"
                         th:text="${todaySchedule == null or todaySchedule.entry == null ? 'Fichar Entrada' :
-                          (todaySchedule.exit == null ? 'Fichar salida' : 'Jornada Finalizada')}">
-                </button>
-            </form>
-            <form action="/user/clockin" class="d-inline" method="post">
-                <input name="accion" type="hidden" value="salida">
-            </form>
-        </div>
-    </div>
-
-    <div class="row d-flex justify-content-center px-3" th:if="${hasPause}">
-        <h2>Fichaje Pausas</h2>
-        <div class="alert alert-warning w-50" role="alert">
-            <form action="/user/clockin" class="d-inline" method="post">
-                <input name="_csrf" th:value="${_csrf.token}" type="hidden">
-                <input name="accion" type="hidden" value="desayuno">
-                <button class="btn btn-primary" th:text="${todaySchedule.pauseEntry == null ? 'Iniciar pausa desayuno' :
-                        (todaySchedule.pauseExit== null ? 'Finalizar pausa desayuno' : 'Pausa desayuno realizada')}">
-                </button>
-            </form>
-            <form action="/user/clockin" class="d-inline" method="post">
-                <input name="_csrf" th:value="${_csrf.token}" type="hidden">
-                <input name="accion" type="hidden" value="comida">
-                <button class="btn btn-primary" th:text="${todaySchedule.lunchEntry == null ? 'Iniciar pausa comida' :
-                        (todaySchedule.lunchExit== null ? 'Finalizar pausa comida' : 'Pausa comida realizada')}">
+                          (todaySchedule.exit == null ? 'Fichar Salida' : 'Jornada Finalizada')}">
                 </button>
             </form>
         </div>
     </div>
 </section>
-
+<section class="container-fluid text-center my-5" th:if="${hasPause}">
+    <div class="row d-flex justify-content-center px-3">
+        <h2>Fichaje Pausas</h2>
+        <div class="alert alert-warning w-50 shadow" role="alert">
+            <form action="/user/clockin" class="d-inline" method="post">
+                <input name="_csrf" th:value="${_csrf.token}" type="hidden">
+                <input name="accion" type="hidden" value="desayuno">
+                <button class="btn btn-primary" th:text="${todaySchedule.pauseEntry == null ? 'Iniciar Pausa Desayuno' :
+                        (todaySchedule.pauseExit== null ? 'Finalizar Pausa Desayuno' : 'Pausa Desayuno Realizada')}">
+                </button>
+            </form>
+            <form action="/user/clockin" class="d-inline" method="post">
+                <input name="_csrf" th:value="${_csrf.token}" type="hidden">
+                <input name="accion" type="hidden" value="comida">
+                <button class="btn btn-primary" th:text="${todaySchedule.lunchEntry == null ? 'Iniciar Pausa Comida' :
+                        (todaySchedule.lunchExit== null ? 'Finalizar Pausa Comida' : 'Pausa Comida Realizada')}">
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-<script th:src="@{/js/script.js}"></script>
 </body>
 </html>

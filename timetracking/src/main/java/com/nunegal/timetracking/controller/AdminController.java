@@ -36,10 +36,21 @@ public class AdminController {
 
     @GetMapping("/index")
     public String index(Model model, Principal principal) {
+        EmployeeDto employee = employeeService.findByUsername(principal.getName());
         List<EmployeeDto> employeeList = employeeService.findAll();
+        model.addAttribute("employee", employee);
         model.addAttribute("employees", employeeList);
         model.addAttribute("adminName", principal.getName());
         return "admin/index";
+    }
+
+    @GetMapping("/switch")
+    public String switchToUser(Principal principal) {
+        try {
+            return "redirect:/user/index";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @GetMapping("/delete/{id}")
